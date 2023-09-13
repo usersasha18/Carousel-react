@@ -21,7 +21,11 @@ export default function Slider() {
 
   return (
       <>
-        <Carousel data={data} slideToShow={2} speed={2000}/>
+        {data.length > 0 ? (
+          <Carousel data={data} slideToShow={2} speed={2000} />
+        ) : (
+          <p>Загрузка данных...</p>
+        )}
       </>
   )
 }
@@ -34,10 +38,11 @@ function  Carousel({ data, slideToShow, speed}) {
     )
   }
 
-  const [currentIndex ,setCurrentIndex] = useState(0)
+  const [currentIndex ,setCurrentIndex] = useState(0);
+  const [carouselData, setCarouselData] = useState([...data]);
+  const duplicatedData = [...data];
   const maxIndex = data.length - slideToShow;
   const carouselRef = useRef(document.documentElement)
-
 
   // change styles width;
   useEffect(() => {
@@ -47,7 +52,7 @@ function  Carousel({ data, slideToShow, speed}) {
   const nextClick = () => {
     setCurrentIndex((prevIndex) => {
       const newIndex = prevIndex + 1;
-      return newIndex > maxIndex ? 0 : newIndex;
+      return newIndex < data.length ? newIndex : newIndex;
     });
   }
 
@@ -63,7 +68,12 @@ function  Carousel({ data, slideToShow, speed}) {
     const intervalId = setInterval(() => {
       setCurrentIndex((prevIndex) => {
         const newIndex = prevIndex + slideToShow;
-        return newIndex > maxIndex ? 0 : newIndex;
+        if (newIndex < data.length) {
+          setCarouselData((prevData) => [...prevData, ...data]);
+          return newIndex;
+        } else {
+          return newIndex
+        }
       });
     }, speed);
 
@@ -73,18 +83,18 @@ function  Carousel({ data, slideToShow, speed}) {
   }, [data, maxIndex, speed]);
 
   return (
-<div className="wrapper">
-  <button onClick={prevClick}>Предыдущий</button>
-  {data.length > 0 ? (
-    <div className="carousel">
-      {data.map((item, index) => (
-        <img key={index} src={item.image} alt="" style={{ transform: `translateX(-${currentIndex * (100 + slideToShow)}%)` }}/>
-      ))}
+    <div className="wrapper">
+      <button onClick={prevClick}>Предыдущий</button>
+      {carouselData.length > 0 ? (
+        <div className="carousel">
+            {carouselData.map((item, index) => (
+              <img key={index} src={item.image} alt="" style={{ transform: `translateX(-${currentIndex * (100 + slideToShow)}%)` }}/>
+            ))}
+          </div>
+        ) : (
+          <p>netu slidov</p>
+        )}
+      <button onClick={nextClick}>Следующий</button>
     </div>
-  ) : (
-    <p>netu slidov</p>
-  )}
-  <button onClick={nextClick}>Следующий</button>
-</div>
   )
 }
