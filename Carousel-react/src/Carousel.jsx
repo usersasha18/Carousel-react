@@ -25,7 +25,7 @@ export default function Slider() {
   return (
       <>
         {data.length > 0 ? (
-          <Carousel data={data} slideToShow={5} speed={2000}/>
+          <Carousel data={data} slideToShow={2} speed={2000}/>
         ) : (
           <p>Загрузка данных...</p>
         )}
@@ -53,11 +53,13 @@ function Carousel({ data, slideToShow, speed }) {
   const slider = useRef(null)
   const sliderCarousel = useRef(null)
   const [direction, setDirection] = useState();
+    const [disabledButton, setDisabledbutton] = useState(false);
+  const buttonRef = useRef(null);
 
   useEffect(() => {
     document.documentElement.style.setProperty('--slide-to-show', slideToShow);
   }, [slideToShow]);
-      /*
+  /*
       функции перелистывания слайдов делают вот что:
       Мы записываем в состояние setCurrentIndex индекс активного слайда 
       currentIndex = 0, потом происходит нажатие на кнопку, после этого мы создаем новую переменную newIndex куда и будем записывать новый индекс для отображение слайдов
@@ -71,9 +73,11 @@ function Carousel({ data, slideToShow, speed }) {
       
       В функции prevClick происходит тоже самое, только наоборот
       */
+     
   
   const nextClick = () => {
     setDirection(-1)
+    setDisabledbutton(true)
     const sliderContainer = slider.current;
     const sliderCarouselMain = sliderCarousel.current
     sliderCarouselMain.style.justifyContent = `flex-start`
@@ -83,6 +87,7 @@ function Carousel({ data, slideToShow, speed }) {
 
   const prevClick = () => {
     setDirection(1); // устанавливаю значение 1 для перемещения слайдов назад
+    setDisabledbutton(true)
     const sliderContainer = slider.current;
     const sliderCarouselMain = sliderCarousel.current;
   
@@ -95,7 +100,7 @@ function Carousel({ data, slideToShow, speed }) {
     // передвигаем слайдер на 100 процентов вперед
     sliderContainer.style.transition = "none";
     sliderContainer.style.transform = `translate(-100%)`;
-  
+    
     // сброс всем стилей 
     setTimeout(() => {
       sliderContainer.style.transition = "transform .5s linear";
@@ -115,6 +120,7 @@ function Carousel({ data, slideToShow, speed }) {
     sliderContainer.style.transform = 'translate(0)';
 
     setTimeout(() => {
+      setDisabledbutton(false)
       sliderContainer.style.transition = "all .5s linear";
     });
 
@@ -133,7 +139,7 @@ function Carousel({ data, slideToShow, speed }) {
 
   return (
     <div className="wrapper">
-      <button onClick={prevClick}>Предыдущий</button>
+      <button onClick={prevClick} ref={buttonRef} disabled={disabledButton}>Предыдущий</button>
         <div className="carousel" ref={sliderCarousel}>
           <div
             className="inner_carousel"
@@ -152,7 +158,7 @@ function Carousel({ data, slideToShow, speed }) {
           ))}
         </div>
       </div>
-    <button onClick={nextClick}>Следующий</button>
+    <button onClick={nextClick} ref={buttonRef} disabled={disabledButton}>Следующий</button>
     </div>
   );
 } 
