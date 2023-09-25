@@ -10,4 +10,3 @@ export async function useGetData(url = "http://localhost", type = "GET") {
              return "неверный параметр запроса";
     }
 }
-
